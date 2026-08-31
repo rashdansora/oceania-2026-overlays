@@ -590,15 +590,7 @@
       }
     }
 
-const peer = new Peer('openlifter-obs-overlay-sora', {
-  config: {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:19302' }
-    ]
-  }
-});
+    const peer = new Peer('openlifter-obs-overlay-sora');
 
     peer.on('connection', (conn) => {
       conn.on('data', (d) => {
