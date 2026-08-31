@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>Oceania 2026 Stream - Squat Standings</title>
+  <title>Oceania 2026 Stream - Deadlift Standings</title>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap');
@@ -22,268 +21,113 @@
       --first-place-bg: rgba(245, 158, 11, 0.15);
     }
 
-    * {
-      box-sizing: border-box;
-      user-select: none;
-    }
+    * { box-sizing: border-box; user-select: none; }
 
     body {
-      margin: 0;
-      padding: 0;
-      width: 1920px;
-      height: 1080px;
+      margin: 0; padding: 0;
+      width: 1920px; height: 1080px;
       background: transparent;
       font-family: 'Montserrat', sans-serif;
-      overflow: hidden;
-      position: relative;
+      overflow: hidden; position: relative;
       -webkit-font-smoothing: antialiased;
     }
 
     .leaderboard-card {
-      position: absolute;
-      top: 60px;
-      bottom: 60px;
-      right: 60px;
-      width: 1248px;
-      height: calc(1080px - 120px);
+      position: absolute; top: 60px; bottom: 60px; right: 60px;
+      width: 1248px; height: calc(1080px - 120px);
       background: var(--bg-dark);
       border: 2px solid rgba(0, 180, 216, 0.5);
       border-radius: 8px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      overflow: hidden; display: flex; flex-direction: column;
     }
 
     .lb-header {
       background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 100%);
-      padding: 20px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 3px solid var(--cyan-primary);
-      flex-shrink: 0;
+      padding: 20px 30px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 3px solid var(--cyan-primary); flex-shrink: 0;
     }
 
-    .lb-title-group {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+    .lb-title-group { display: flex; align-items: center; gap: 15px; }
 
     .lb-logo-badge {
-      background: var(--cyan-primary);
-      color: var(--bg-dark);
-      font-weight: 900;
-      font-size: 22px;
-      padding: 6px 16px;
-      border-radius: 4px;
-      letter-spacing: -1px;
+      background: var(--cyan-primary); color: var(--bg-dark);
+      font-weight: 900; font-size: 22px; padding: 6px 16px; border-radius: 4px; letter-spacing: -1px;
     }
 
-    .lb-title {
-      color: var(--text-white);
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+    .lb-title { color: var(--text-white); font-size: 26px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
 
-    .lb-meta-group {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+    .lb-meta-group { display: flex; align-items: center; gap: 15px; }
 
     .page-badge {
-      background: rgba(0, 180, 216, 0.2);
-      border: 1px solid var(--cyan-primary);
-      color: var(--cyan-bright);
-      font-size: 14px;
-      font-weight: 900;
-      padding: 5px 14px;
-      border-radius: 12px;
-      letter-spacing: 0.5px;
+      background: rgba(0, 180, 216, 0.2); border: 1px solid var(--cyan-primary);
+      color: var(--cyan-bright); font-size: 14px; font-weight: 900; padding: 5px 14px; border-radius: 12px; letter-spacing: 0.5px;
     }
 
-    .lb-subtitle {
-      color: var(--cyan-bright);
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-    }
+    .lb-subtitle { color: var(--cyan-bright); font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
 
     .category-divider {
       background: linear-gradient(90deg, rgba(0, 180, 216, 0.3) 0%, rgba(11, 29, 58, 0.8) 100%);
-      color: var(--cyan-bright);
-      font-size: 15px;
-      font-weight: 900;
-      padding: 10px 30px;
-      letter-spacing: 1px;
-      border-top: 1px solid rgba(0, 180, 216, 0.4);
-      border-bottom: 1px solid rgba(0, 180, 216, 0.4);
-      text-transform: uppercase;
-      flex-shrink: 0;
+      color: var(--cyan-bright); font-size: 15px; font-weight: 900; padding: 10px 30px;
+      letter-spacing: 1px; border-top: 1px solid rgba(0, 180, 216, 0.4); border-bottom: 1px solid rgba(0, 180, 216, 0.4);
+      text-transform: uppercase; flex-shrink: 0;
     }
 
     .lb-table-header {
-      display: grid;
-      grid-template-columns: 55px 75px 1fr 90px 90px 90px 110px 100px;
-      padding: 12px 30px;
-      background: rgba(255, 255, 255, 0.03);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--cyan-bright);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      align-items: center;
-      flex-shrink: 0;
+      display: grid; grid-template-columns: 55px 75px 1fr 90px 90px 90px 110px 100px;
+      padding: 12px 30px; background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: var(--cyan-bright);
+      font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; align-items: center; flex-shrink: 0;
     }
 
-    .col-center {
-      text-align: center;
-    }
+    .col-center { text-align: center; }
+    .col-right { text-align: right; }
 
-    .col-right {
-      text-align: right;
-    }
-
-    .lb-rows-container {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      opacity: 1;
-      transition: opacity 0.35s ease-in-out;
-      overflow: hidden;
-    }
-
-    .lb-rows-container.fading {
-      opacity: 0;
-    }
+    .lb-rows-container { display: flex; flex-direction: column; flex: 1; opacity: 1; transition: opacity 0.35s ease-in-out; overflow: hidden; }
+    .lb-rows-container.fading { opacity: 0; }
 
     .lb-row {
-      display: grid;
-      grid-template-columns: 55px 75px 1fr 90px 90px 90px 110px 100px;
-      padding: 12px 30px;
-      align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      color: var(--text-white);
-      font-weight: 800;
-      font-size: 17px;
+      display: grid; grid-template-columns: 55px 75px 1fr 90px 90px 90px 110px 100px;
+      padding: 12px 30px; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-white); font-weight: 800;
     }
 
-    .lb-row:nth-child(even) {
-      background: rgba(255, 255, 255, 0.015);
-    }
+    .lb-row:nth-child(even) { background: rgba(255, 255, 255, 0.015); }
+    .lb-row.rank-1 { background: var(--first-place-bg); border-left: 4px solid var(--pa-gold); }
 
-    .lb-row.rank-1 {
-      background: var(--first-place-bg);
-      border-left: 4px solid var(--pa-gold);
-    }
+    .rank-badge { font-size: 21px; font-weight: 900; color: var(--text-muted); text-align: center; }
+    .lb-row.rank-1 .rank-badge { color: var(--pa-gold); }
 
-    .rank-badge {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--text-muted);
-      text-align: center;
-    }
+    .nation-col { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; }
+    .flag-badge { width: 24px; height: 16px; border-radius: 2px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.2); }
+    .lifter-name { font-size: 21px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .lb-row.rank-1 .rank-badge {
-      color: var(--pa-gold);
-    }
-
-    .nation-col {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 14px;
-    }
-
-    .flag-badge {
-      width: 24px;
-      height: 16px;
-      border-radius: 2px;
-      object-fit: cover;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .lifter-name {
-      font-size: 21px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .att-pill-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
+    .att-pill-cell { display: flex; align-items: center; justify-content: center; }
     .att-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px 6px;
-      border-radius: 4px;
-      font-weight: 900;
-      font-size: 21px;
-      width: 72px;
-      text-align: center;
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 4px 6px; border-radius: 4px; font-weight: 900; font-size: 21px; width: 75px; text-align: center;
+      letter-spacing: -0.5px;
     }
-
     .att-badge.good {
-      background: var(--good-green);
-      color: #ffffff;
-      box-shadow: none;
-      /* Kills the optical blur/glow */
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      /* Sharpen character edges */
+      background: var(--good-green); color: #ffffff; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
-
     .att-badge.no-lift {
-      background: var(--no-lift-red);
-      color: #ffffff;
-      box-shadow: none;
-      /* Kills the optical blur/glow */
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      /* Sharpen character edges */
+      background: var(--no-lift-red); color: #ffffff; box-shadow: none; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
+    .att-badge.pending { background: rgba(255, 255, 255, 0.08); color: var(--text-white); }
+    .att-badge.empty { color: var(--text-muted); }
 
-    .att-badge.pending {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-white);
-    }
-
-    .att-badge.empty {
-      color: var(--text-muted);
-    }
-
-    .total-val {
-      font-size: 21px;
-      font-weight: 900;
-      color: var(--pa-gold);
-      text-align: right;
-    }
-
-    .wilks-val {
-      font-size: 21px;
-      font-weight: 900;
-      color: var(--text-white);
-      text-align: right;
-    }
+    .total-val { font-size: 21px; font-weight: 900; color: var(--pa-gold); text-align: right; }
+    .wilks-val { font-size: 21px; font-weight: 900; color: var(--text-white); text-align: right; }
   </style>
 </head>
-
 <body>
 
   <div class="leaderboard-card">
     <div class="lb-header">
       <div class="lb-title-group">
-        <div class="lb-logo-badge">SQT</div>
-        <div class="lb-title">SQUAT STANDINGS</div>
+        <div class="lb-logo-badge">DEAD</div>
+        <div class="lb-title">DEADLIFT STANDINGS</div>
       </div>
       <div class="lb-meta-group">
         <div class="page-badge" id="pageBadge">PAGE 1 / 1</div>
@@ -295,10 +139,10 @@
       <div class="col-center">RANK</div>
       <div class="col-center">NAT</div>
       <div>ATHLETE</div>
-      <div class="col-center">SQUAT 1</div>
-      <div class="col-center">SQUAT 2</div>
-      <div class="col-center">SQUAT 3</div>
-      <div class="col-right">BEST SQUAT</div>
+      <div class="col-center">DEADLIFT 1</div>
+      <div class="col-center">DEADLIFT 2</div>
+      <div class="col-center">DEADLIFT 3</div>
+      <div class="col-right">BEST DEADLIFT</div>
       <div class="col-right">WILKS</div>
     </div>
 
@@ -354,7 +198,7 @@
       const blocks = [];
       Object.keys(grouped).forEach(groupKey => {
         const categoryLifters = grouped[groupKey];
-        categoryLifters.sort((a, b) => (parseFloat(b.bestSquat) || 0) - (parseFloat(a.bestSquat) || 0));
+        categoryLifters.sort((a, b) => (parseFloat(b.bestDead) || 0) - (parseFloat(a.bestDead) || 0));
 
         categoryLifters.forEach((l, idx) => {
           blocks.push({ type: 'row', data: l, rank: idx + 1, category: groupKey });
@@ -403,11 +247,11 @@
           const row = document.createElement('div');
           row.className = `lb-row ${rank === 1 ? 'rank-1' : ''}`;
 
-          const flagHtml = norm.iso2
+          const flagHtml = norm.iso2 
             ? `<img class="flag-badge" src="https://flagcdn.com/w80/${norm.iso2}.png" onerror="this.style.display='none'" />`
             : '';
 
-          const atts = l.squatAtts || [{ val: '-' }, { val: '-' }, { val: '-' }];
+          const atts = l.deadAtts || [{val:'-'},{val:'-'},{val:'-'}];
 
           row.innerHTML = `
             <div class="rank-badge">${rank}</div>
@@ -416,7 +260,7 @@
             ${formatPillBadge(atts[0])}
             ${formatPillBadge(atts[1])}
             ${formatPillBadge(atts[2])}
-            <div class="total-val">${l.bestSquat !== '-' ? l.bestSquat + 'kg' : '-'}</div>
+            <div class="total-val">${l.bestDead !== '-' ? l.bestDead + 'kg' : '-'}</div>
             <div class="wilks-val">${l.points !== '-' ? l.points : '-'}</div>
           `;
 
@@ -439,18 +283,17 @@
       }, PAGE_CYCLE_MS);
     }
 
-const peer = new Peer('openlifter-obs-lb-squat-sora', {
-  config: {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:19302' }
-    ]
-  }
-});
+    const peer = new Peer('openlifter-obs-lb-dead-sora');
+    peer.on('connection', (conn) => {
+      conn.on('data', (d) => {
+        if (d && d.standings) {
+          cachedStandings = d.standings;
+          renderCurrentPage();
+        }
+      });
+    });
 
     startAutoPaging();
   </script>
 </body>
-
 </html>
