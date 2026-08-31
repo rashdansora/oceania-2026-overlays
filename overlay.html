@@ -590,7 +590,7 @@
       }
     }
 
-    const peer = new Peer('openlifter-obs-overlay-sora');
+const peer = new Peer('openlifter-obs-overlay-sora', { config: { iceServers: [...] } });
 
     peer.on('connection', (conn) => {
       conn.on('data', (d) => {
