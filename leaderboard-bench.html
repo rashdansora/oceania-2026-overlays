@@ -283,15 +283,15 @@
       }, PAGE_CYCLE_MS);
     }
 
-const peer = new Peer('openlifter-obs-lb-bench-sora', {
-  config: {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:19302' }
-    ]
-  }
-});
+    const peer = new Peer('openlifter-obs-lb-bench-sora');
+    peer.on('connection', (conn) => {
+      conn.on('data', (d) => {
+        if (d && d.standings) {
+          cachedStandings = d.standings;
+          renderCurrentPage();
+        }
+      });
+    });
 
     startAutoPaging();
   </script>
