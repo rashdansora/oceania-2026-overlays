@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>Oceania 2026 Stream Overlay - Ref Lights WebRTC Fixed</title>
+  <title>Oceania 2026 Stream - Athlete Lower Third Overlay</title>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap');
@@ -11,14 +10,13 @@
     :root {
       --bg-dark: #061325;
       --bg-card: #0b1d3a;
-      --bg-ice: #dbeafe;
       --cyan-primary: #00b4d8;
       --cyan-bright: #38bdf8;
       --text-white: #ffffff;
       --text-muted: #94a3b8;
-      --good-green: #22c55e;
-      --no-lift-red: #ef233c;
-      --pa-gold: #f59e0b;
+      --good-green: #16a34a;
+      --no-lift-red: #dc2626;
+      --active-gold: #f59e0b;
     }
 
     * {
@@ -32,397 +30,244 @@
       width: 1920px;
       height: 1080px;
       background: transparent;
-      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Montserrat', sans-serif;
       overflow: hidden;
+      position: relative;
       -webkit-font-smoothing: antialiased;
     }
 
-    .sheffield-container {
+    .overlay-card {
       position: absolute;
       bottom: 60px;
       left: 60px;
-      display: flex;
-      flex-direction: column;
-      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.9));
-      transform: translateZ(0);
-      will-change: opacity, transform;
-    }
-
-    /* 3-LIGHT REFEREE POPUP */
-    .ref-lights-popup {
-      align-self: flex-start;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 100%);
-      border: 2px solid rgba(0, 180, 216, 0.4);
-      border-bottom: none;
-      padding: 8px 20px;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      margin-bottom: -2px;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      pointer-events: none;
-    }
-
-    .ref-lights-popup.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .ref-light-node {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #1e293b;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .ref-light-node.white {
-      background: #ffffff !important;
-      border-color: #ffffff !important;
-      box-shadow: 0 0 14px rgba(255, 255, 255, 0.95);
-    }
-
-    .ref-light-node.red {
-      background: var(--no-lift-red) !important;
-      border-color: var(--no-lift-red) !important;
-      box-shadow: 0 0 14px rgba(239, 35, 60, 0.95);
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: stretch;
-      z-index: 2;
-    }
-
-    .nation-box {
-      background: var(--bg-ice);
-      color: var(--bg-dark);
-      font-size: 18px;
-      font-weight: 900;
-      padding: 0 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border-top: 2px solid rgba(0, 180, 216, 0.5);
-      border-left: 2px solid rgba(0, 180, 216, 0.5);
-      border-top-left-radius: 4px;
-      min-width: 90px;
-      letter-spacing: -0.5px;
-    }
-
-    .flag-badge {
-      width: 26px;
-      height: 18px;
-      border-radius: 2px;
-      object-fit: cover;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      display: none;
-      flex-shrink: 0;
-    }
-
-    .name-box {
-      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 100%);
-      color: var(--text-white);
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      padding: 10px 18px;
-      display: flex;
-      align-items: center;
-      width: 380px;
-      height: 48px;
-      white-space: nowrap;
-      overflow: hidden;
-      border-top: 2px solid rgba(0, 180, 216, 0.5);
-    }
-
-    .name-text {
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 22px;
-      transition: font-size 0.15s ease-out;
-    }
-
-    .class-box {
-      background: var(--bg-ice);
-      color: var(--bg-dark);
-      font-size: 20px;
-      font-weight: 900;
-      padding: 0 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-top: 2px solid rgba(0, 180, 216, 0.5);
-      border-right: 2px solid rgba(0, 180, 216, 0.5);
-      border-top-right-radius: 4px;
-      min-width: 90px;
-      letter-spacing: -0.5px;
-    }
-
-    .main-bar {
-      display: flex;
-      height: 76px;
+      width: 820px;
       background: var(--bg-dark);
       border: 2px solid rgba(0, 180, 216, 0.5);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      border-bottom-left-radius: 4px;
-      border-bottom-right-radius: 4px;
-      align-items: center;
-      z-index: 1;
-    }
-
-    .logo-container {
-      width: 95px;
-      height: 100%;
-      background: var(--cyan-primary);
-      clip-path: polygon(0 0, 100% 0, 75% 100%, 0 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-right: 14px;
-    }
-
-    .logo-text {
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--bg-dark);
-      letter-spacing: -0.5px;
-      text-transform: uppercase;
-    }
-
-    .attempts-stream {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 0 28px;
-    }
-
-    .attempt-val {
-      font-size: 32px;
-      font-weight: 900;
-      min-width: 65px;
-      text-align: center;
-      transition: color 0.25s ease, transform 0.15s ease;
-      will-change: color, transform;
-    }
-
-    .attempt-val.active {
-      color: var(--text-white) !important;
-      transform: scale(1.05);
-    }
-
-    .attempt-val.good {
-      color: var(--good-green) !important;
-      animation: popGood 0.3s ease-out;
-    }
-
-    .attempt-val.no-lift {
-      color: var(--no-lift-red) !important;
-      animation: popNoLift 0.3s ease-out;
-    }
-
-    .attempt-val.pending {
-      color: var(--text-muted) !important;
-      opacity: 0.6;
-    }
-
-    @keyframes popGood {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.15);
-        color: #4ade80;
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    @keyframes popNoLift {
-      0% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.15);
-        color: #f87171;
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    .divider {
-      width: 2px;
-      height: 24px;
-      background: linear-gradient(180deg, transparent 0%, var(--cyan-bright) 50%, transparent 100%);
-      opacity: 0.7;
-    }
-
-    .subtotal-stack {
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 0 22px;
-      border-left: 1px solid rgba(0, 180, 216, 0.35);
-      gap: 4px;
-      min-width: 115px;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.02);
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
-    .subtotal-row {
+    .card-header {
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-card) 100%);
+      padding: 16px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--text-white);
-      line-height: 1;
+      border-bottom: 3px solid var(--cyan-primary);
     }
 
-    .subtotal-row span:first-child {
+    .lifter-info-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .flag-badge {
+      width: 36px;
+      height: 24px;
+      border-radius: 3px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .lifter-name {
+      color: var(--text-white);
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 480px;
+    }
+
+    .meta-badge {
+      background: rgba(0, 180, 216, 0.15);
+      border: 1px solid var(--cyan-primary);
       color: var(--cyan-bright);
-      margin-right: 12px;
       font-size: 15px;
       font-weight: 900;
+      padding: 6px 14px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    .subtotal-line {
-      height: 1px;
-      background: var(--cyan-primary);
-      opacity: 0.35;
-      width: 100%;
+    .card-body {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 29, 58, 0.4);
+    }
+
+    .discipline-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .discipline-label {
+      color: var(--cyan-bright);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .discipline-title {
+      color: var(--text-white);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+
+    .attempts-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .att-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 85px;
+      height: 44px;
+      border-radius: 6px;
+      font-weight: 900;
+      font-size: 21px;
+      letter-spacing: -0.5px;
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .att-badge.good {
+      background: var(--good-green);
+      color: #ffffff;
+      border: none;
+      box-shadow: none;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .att-badge.no-lift {
+      background: var(--no-lift-red);
+      color: #ffffff;
+      border: none;
+      box-shadow: none;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .att-badge.active {
+      background: var(--active-gold);
+      color: #061325;
+      border: none;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .card-footer {
+      background: rgba(6, 19, 37, 0.8);
+      padding: 12px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .subtotal-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subtotal-label {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .subtotal-val {
+      color: var(--text-white);
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .status-dot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+
+    .status-dot.connected {
+      background: #22c55e;
     }
   </style>
 </head>
-
 <body>
 
-  <div class="sheffield-container" id="container">
-    <div class="ref-lights-popup" id="refPopup">
-      <div class="ref-light-node" id="refLight1"></div>
-      <div class="ref-light-node" id="refLight2"></div>
-      <div class="ref-light-node" id="refLight3"></div>
+  <div class="overlay-card" id="overlayCard">
+    <div class="status-dot" id="statusDot" title="PeerJS Connection Status"></div>
+
+    <div class="card-header">
+      <div class="lifter-info-group">
+        <img class="flag-badge" id="flagImg" src="" style="display: none;" alt="Nation Flag" />
+        <div class="lifter-name" id="lifterName">WAITING FOR DATA...</div>
+      </div>
+      <div class="meta-badge" id="metaBadge">OPEN</div>
     </div>
 
-    <div class="top-bar">
-      <div class="nation-box" id="nationBox">
-        <img id="flagImg" class="flag-badge" src="" alt="Flag" />
-        <span id="countryText">---</span>
+    <div class="card-body">
+      <div class="discipline-group">
+        <div class="discipline-label">ACTIVE MOVEMENT</div>
+        <div class="discipline-title" id="discTitle">SQUAT</div>
       </div>
-      <div class="name-box">
-        <span class="name-text" id="nameText">ATHLETE</span>
+
+      <div class="attempts-container">
+        <div class="att-badge" id="att1">-</div>
+        <div class="att-badge" id="att2">-</div>
+        <div class="att-badge" id="att3">-</div>
       </div>
-      <div class="class-box" id="classBox">0KG</div>
     </div>
 
-    <div class="main-bar">
-      <div class="logo-container">
-        <div class="logo-text" id="logoText">SQT</div>
+    <div class="card-footer">
+      <div class="subtotal-item">
+        <span class="subtotal-label">SQ:</span>
+        <span class="subtotal-val" id="subS">-</span>
       </div>
-
-      <div class="attempts-stream">
-        <div class="attempt-val pending" id="att1">-</div>
-        <div class="divider"></div>
-        <div class="attempt-val pending" id="att2">-</div>
-        <div class="divider"></div>
-        <div class="attempt-val pending" id="att3">-</div>
+      <div class="subtotal-item">
+        <span class="subtotal-label">BP:</span>
+        <span class="subtotal-val" id="subB">-</span>
       </div>
-
-      <div class="subtotal-stack">
-        <div class="subtotal-row"><span>S</span><span id="subS">-</span></div>
-        <div class="subtotal-line"></div>
-        <div class="subtotal-row"><span>B</span><span id="subB">-</span></div>
-        <div class="subtotal-line"></div>
-        <div class="subtotal-row"><span>D</span><span id="subD">-</span></div>
+      <div class="subtotal-item">
+        <span class="subtotal-label">DL:</span>
+        <span class="subtotal-val" id="subD">-</span>
       </div>
     </div>
   </div>
 
   <script>
-    const nameText = document.getElementById('nameText');
-    const flagImg = document.getElementById('flagImg');
-    const countryText = document.getElementById('countryText');
-    const classBox = document.getElementById('classBox');
-    const logoText = document.getElementById('logoText');
-    const atts = [
-      document.getElementById('att1'),
-      document.getElementById('att2'),
-      document.getElementById('att3')
-    ];
-    const subS = document.getElementById('subS');
-    const subB = document.getElementById('subB');
-    const subD = document.getElementById('subD');
-    const container = document.getElementById('container');
+    const elName = document.getElementById('lifterName');
+    const elMeta = document.getElementById('metaBadge');
+    const elDisc = document.getElementById('discTitle');
+    const elFlag = document.getElementById('flagImg');
+    const elDot = document.getElementById('statusDot');
 
-    const refPopup = document.getElementById('refPopup');
-    const refLights = [
-      document.getElementById('refLight1'),
-      document.getElementById('refLight2'),
-      document.getElementById('refLight3')
-    ];
-    let refDismissTimer = null;
+    const elAtt1 = document.getElementById('att1');
+    const elAtt2 = document.getElementById('att2');
+    const elAtt3 = document.getElementById('att3');
 
-    let activeState = null;
-    let pendingState = null;
-    let isHoldActive = false;
-    let holdTimer = null;
-
-    function renderRefLights(lightsArray) {
-      if (!lightsArray || !Array.isArray(lightsArray)) return;
-
-      const hasActiveLight = lightsArray.some(s => s === 'white' || s === 'red');
-
-      if (!hasActiveLight) {
-        refPopup.classList.remove('active');
-        return;
-      }
-
-      lightsArray.forEach((state, i) => {
-        refLights[i].className = `ref-light-node ${state}`;
-      });
-
-      refPopup.classList.add('active');
-
-      if (refDismissTimer) clearTimeout(refDismissTimer);
-      refDismissTimer = setTimeout(() => {
-        refPopup.classList.remove('active');
-      }, 6000);
-    }
-
-    // Transport Channel Fallbacks
-    try {
-      const refChannel = new BroadcastChannel('sheffield-ref-channel');
-      refChannel.onmessage = (e) => {
-        if (e.data && e.data.type === 'REF_LIGHTS') {
-          renderRefLights(e.data.lights);
-        }
-      };
-    } catch (e) { }
-
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'sheffield-ref-payload' && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          if (parsed.type === 'REF_LIGHTS') {
-            renderRefLights(parsed.lights);
-          }
-        } catch (err) { }
-      }
-    });
+    const elSubS = document.getElementById('subS');
+    const elSubB = document.getElementById('subB');
+    const elSubD = document.getElementById('subD');
 
     const countryDb = [
       { code3: 'SRI', iso2: 'lk', names: ['SRI', 'LK', 'SRI LANKA'] },
@@ -441,163 +286,99 @@
       { code3: 'USA', iso2: 'us', names: ['USA', 'US', 'UNITED STATES'] }
     ];
 
-    function adjustNameFontSize(name) {
-      if (name.length > 20) {
-        nameText.style.fontSize = '15px';
-      } else if (name.length > 15) {
-        nameText.style.fontSize = '18px';
-      } else {
-        nameText.style.fontSize = '22px';
-      }
-    }
-
     function normalizeCountry(rawInput) {
-      if (!rawInput || rawInput === '-' || rawInput.trim() === '') {
-        return { code3: '---', iso2: null };
-      }
-
+      if (!rawInput || rawInput === '-') return { code3: '', iso2: null };
       const clean = rawInput.toString().trim().toUpperCase();
       const match = countryDb.find(c => c.names.includes(clean));
-
-      if (match) {
-        return { code3: match.code3, iso2: match.iso2 };
-      }
-
-      if (clean.length === 3) {
-        return { code3: clean, iso2: clean.toLowerCase() };
-      } else if (clean.length === 2) {
-        return { code3: clean + 'A', iso2: clean.toLowerCase() };
-      }
-
+      if (match) return { code3: match.code3, iso2: match.iso2 };
+      if (clean.length === 3) return { code3: clean, iso2: clean.toLowerCase() };
       return { code3: clean.substring(0, 3), iso2: null };
     }
 
-    function updateNationBox(rawCountry) {
-      const norm = normalizeCountry(rawCountry);
-      countryText.textContent = norm.code3;
+    function renderPill(element, attemptData) {
+      if (!attemptData || !attemptData.val || attemptData.val === '-') {
+        element.textContent = '-';
+        element.className = 'att-badge';
+        return;
+      }
 
-      if (norm.iso2) {
-        flagImg.src = `https://flagcdn.com/w80/${norm.iso2}.png`;
-        flagImg.onerror = () => {
-          flagImg.src = `./flags/${norm.iso2}.svg`;
-          flagImg.onerror = () => {
-            flagImg.style.display = 'none';
-          };
-        };
-        flagImg.style.display = 'inline-block';
+      element.textContent = attemptData.val.includes('kg') ? attemptData.val : `${attemptData.val}kg`;
+      
+      if (attemptData.status === 'good') {
+        element.className = 'att-badge good';
+      } else if (attemptData.status === 'no-lift') {
+        element.className = 'att-badge no-lift';
+      } else if (attemptData.status === 'active') {
+        element.className = 'att-badge active';
       } else {
-        flagImg.style.display = 'none';
+        element.className = 'att-badge';
       }
     }
 
-    function updateLiftLogoText(discCode, subtotals) {
-      let code = 'SQT';
-      if (discCode === 'S' || discCode === 'SQUAT') {
-        code = 'SQT';
-      } else if (discCode === 'B' || discCode === 'BENCH') {
-        code = 'BP';
-      } else if (discCode === 'D' || discCode === 'DEAD' || discCode === 'DEADLIFT') {
-        code = 'DL';
-      } else if (subtotals) {
-        if (subtotals.D && subtotals.D !== '-') {
-          code = 'DL';
-        } else if (subtotals.B && subtotals.B !== '-') {
-          code = 'BP';
-        } else {
-          code = 'SQT';
-        }
-      }
-      logoText.textContent = code;
-    }
+    function updateOverlayData(data) {
+      if (!data) return;
 
-    function forceCEFRepaint() {
-      container.style.opacity = '0.999';
-      requestAnimationFrame(() => {
-        container.style.opacity = '1';
-      });
-    }
+      if (data.name) elName.textContent = data.name;
 
-    function applyStateToUI(d) {
-      if (!d) return;
-
-      const nameVal = (d.name || 'ATHLETE').toUpperCase();
-      nameText.textContent = nameVal;
-      adjustNameFontSize(nameVal);
-
-      updateNationBox(d.country);
-
-      classBox.textContent = d.weightClass && d.weightClass !== '-' ? `${d.weightClass}KG` : '-';
-
-      if (d.attempts && Array.isArray(d.attempts) && d.attempts.length >= 3) {
-        d.attempts.forEach((att, idx) => {
-          const targetEl = atts[idx];
-          targetEl.textContent = att.val || '-';
-          targetEl.className = `attempt-val ${att.status || 'pending'}`;
-        });
+      const norm = normalizeCountry(data.country);
+      if (norm.iso2) {
+        elFlag.src = `https://flagcdn.com/w80/${norm.iso2}.png`;
+        elFlag.style.display = 'block';
+      } else {
+        elFlag.style.display = 'none';
       }
 
-      if (d.subtotals) {
-        subS.textContent = d.subtotals.S || '-';
-        subB.textContent = d.subtotals.B || '-';
-        subD.textContent = d.subtotals.D || '-';
+      const wc = data.weightClass && data.weightClass !== '-' ? data.weightClass : '';
+      const div = data.division && data.division !== '-' ? data.division : 'OPEN';
+      elMeta.textContent = wc ? `${div} · ${wc}` : div;
+
+      if (data.discipline === 'S') elDisc.textContent = 'SQUAT';
+      else if (data.discipline === 'B') elDisc.textContent = 'BENCH PRESS';
+      else if (data.discipline === 'D') elDisc.textContent = 'DEADLIFT';
+
+      if (data.attempts && data.attempts.length >= 3) {
+        renderPill(elAtt1, data.attempts[0]);
+        renderPill(elAtt2, data.attempts[1]);
+        renderPill(elAtt3, data.attempts[2]);
       }
 
-      updateLiftLogoText(d.discipline, d.subtotals);
-
-      forceCEFRepaint();
-    }
-
-    function checkLiftCompletion(oldState, newState) {
-      if (!oldState || !oldState.attempts || !newState || !newState.attempts) return false;
-      return newState.attempts.some((att, i) => {
-        const oldAtt = oldState.attempts[i];
-        const wasPendingOrActive = oldAtt && (oldAtt.status === 'pending' || oldAtt.status === 'active');
-        const isNowJudged = att && (att.status === 'good' || att.status === 'no-lift');
-        return wasPendingOrActive && isNowJudged;
-      });
-    }
-
-    function handleIncomingData(d) {
-      if (!d) return;
-
-      // ROUTE 1: Referee Light Packet (Handled Immediately)
-      if (d.type === 'REF_LIGHTS') {
-        renderRefLights(d.lights);
-        return;
-      }
-
-      // ROUTE 2: OpenLifter Athlete State (Subject to 6s delay hold)
-      if (isHoldActive) {
-        pendingState = d;
-        return;
-      }
-
-      const isCompleted = checkLiftCompletion(activeState, d);
-      activeState = d;
-      applyStateToUI(d);
-
-      if (isCompleted) {
-        isHoldActive = true;
-        if (holdTimer) clearTimeout(holdTimer);
-        holdTimer = setTimeout(() => {
-          isHoldActive = false;
-          if (pendingState) {
-            const next = pendingState;
-            pendingState = null;
-            handleIncomingData(next);
-          }
-        }, 6000);
+      if (data.subtotals) {
+        elSubS.textContent = data.subtotals.S !== '-' ? `${data.subtotals.S}kg` : '-';
+        elSubB.textContent = data.subtotals.B !== '-' ? `${data.subtotals.B}kg` : '-';
+        elSubD.textContent = data.subtotals.D !== '-' ? `${data.subtotals.D}kg` : '-';
       }
     }
 
-const peer = new Peer('openlifter-obs-overlay-sora', { config: { iceServers: [...] } });
+    const peer = new Peer('openlifter-obs-overlay-sora', {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    });
+
+    peer.on('open', (id) => {
+      console.log('[Emi-Overlay] Receiver Peer Live:', id);
+    });
 
     peer.on('connection', (conn) => {
-      conn.on('data', (d) => {
-        handleIncomingData(d);
+      console.log('[Emi-Overlay] Incoming connection established from scoring bridge!');
+      elDot.classList.add('connected');
+
+      conn.on('data', (data) => {
+        updateOverlayData(data);
       });
+
+      conn.on('close', () => {
+        elDot.classList.remove('connected');
+      });
+    });
+
+    peer.on('error', (err) => {
+      console.warn('[Emi-Overlay] PeerJS Error:', err);
     });
   </script>
 </body>
-
 </html>
