@@ -45,10 +45,53 @@
       border: 2px solid rgba(0, 180, 216, 0.5);
       border-radius: 8px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95);
-      overflow: hidden;
+      overflow: visible;
       display: flex;
       flex-direction: column;
       transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Ref Decision Badge Floating Header */
+    .ref-lights-container {
+      position: absolute;
+      top: -58px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .ref-lights-container.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .ref-badge {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      transition: all 0.2s ease;
+    }
+
+    .ref-badge.white {
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #ffffff;
+    }
+
+    .ref-badge.red {
+      border-radius: 8px;
+      background: #dc2626;
+      border: 2px solid #ef4444;
+      border-bottom: 5px solid #991b1b;
     }
 
     .card-header {
@@ -58,6 +101,8 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 3px solid var(--cyan-primary);
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
     }
 
     .lifter-info-group {
@@ -177,6 +222,8 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
     }
 
     .subtotal-item {
@@ -216,6 +263,13 @@
 
   <div class="overlay-card" id="overlayCard">
     <div class="status-dot" id="statusDot" title="PeerJS Connection Status"></div>
+
+    <!-- Referee Decision Badge Container -->
+    <div class="ref-lights-container" id="refLightsContainer">
+      <div class="ref-badge" id="refBadge1"></div>
+      <div class="ref-badge" id="refBadge2"></div>
+      <div class="ref-badge" id="refBadge3"></div>
+    </div>
 
     <div class="card-header">
       <div class="lifter-info-group">
@@ -269,6 +323,16 @@
     const elSubB = document.getElementById('subB');
     const elSubD = document.getElementById('subD');
 
+    const refContainer = document.getElementById('refLightsContainer');
+    const refBadges = [
+      document.getElementById('refBadge1'),
+      document.getElementById('refBadge2'),
+      document.getElementById('refBadge3')
+    ];
+
+    const iconCheck = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const iconCross = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
     const countryDb = [
       { code3: 'SRI', iso2: 'lk', names: ['SRI', 'LK', 'SRI LANKA'] },
       { code3: 'PAK', iso2: 'pk', names: ['PAK', 'PK', 'PAKISTAN'] },
@@ -315,17 +379,46 @@
       }
     }
 
+    function updateRefLights(lights) {
+      if (!Array.isArray(lights) || lights.length !== 3) {
+        refContainer.classList.remove('visible');
+        return;
+      }
+
+      // Check if ALL THREE lights are non-'off'
+      const allSelected = lights.every(l => l === 'white' || l === 'red');
+
+      if (!allSelected) {
+        refContainer.classList.remove('visible');
+        return;
+      }
+
+      lights.forEach((state, i) => {
+        if (state === 'white') {
+          refBadges[i].className = 'ref-badge white';
+          refBadges[i].innerHTML = iconCheck;
+        } else if (state === 'red') {
+          refBadges[i].className = 'ref-badge red';
+          refBadges[i].innerHTML = iconCross;
+        }
+      });
+
+      refContainer.classList.add('visible');
+    }
+
     function updateOverlayData(data) {
       if (!data) return;
 
       if (data.name) elName.textContent = data.name;
 
-      const norm = normalizeCountry(data.country);
-      if (norm.iso2) {
-        elFlag.src = `https://flagcdn.com/w80/${norm.iso2}.png`;
-        elFlag.style.display = 'block';
-      } else {
-        elFlag.style.display = 'none';
+      if (data.country !== undefined) {
+        const norm = normalizeCountry(data.country);
+        if (norm.iso2) {
+          elFlag.src = `https://flagcdn.com/w80/${norm.iso2}.png`;
+          elFlag.style.display = 'block';
+        } else {
+          elFlag.style.display = 'none';
+        }
       }
 
       const wc = data.weightClass && data.weightClass !== '-' ? data.weightClass : '';
@@ -349,6 +442,15 @@
       }
     }
 
+    function processPayload(data) {
+      if (!data) return;
+      if (data.type === 'REF_LIGHTS') {
+        updateRefLights(data.lights);
+      } else {
+        updateOverlayData(data);
+      }
+    }
+
     const peer = new Peer('openlifter-obs-overlay-sora', {
       config: {
         iceServers: [
@@ -364,11 +466,11 @@
     });
 
     peer.on('connection', (conn) => {
-      console.log('[Emi-Overlay] Incoming connection established from scoring bridge!');
+      console.log('[Emi-Overlay] Incoming connection established!');
       elDot.classList.add('connected');
 
       conn.on('data', (data) => {
-        updateOverlayData(data);
+        processPayload(data);
       });
 
       conn.on('close', () => {
@@ -378,6 +480,18 @@
 
     peer.on('error', (err) => {
       console.warn('[Emi-Overlay] PeerJS Error:', err);
+    });
+
+    // Local channel listeners (Fallback)
+    try {
+      const bc = new BroadcastChannel('sheffield-ref-channel');
+      bc.onmessage = (e) => processPayload(e.data);
+    } catch (e) {}
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'sheffield-ref-payload' && e.newValue) {
+        try { processPayload(JSON.parse(e.newValue)); } catch (err) {}
+      }
     });
   </script>
 </body>
