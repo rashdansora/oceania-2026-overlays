@@ -308,17 +308,50 @@
       return { code3: clean.substring(0, 3), iso2: null };
     }
 
-    function buildCategoryBlocks(standings) {
-      const grouped = {};
+function buildCategoryBlocks(standings) {
+  const grouped = {};
 
-      standings.forEach(l => {
-        const gender = l.gender || 'MEN';
-        const wc = l.weightClass && l.weightClass !== '-' ? l.weightClass : 'OPEN CATEGORY';
-        const groupKey = `${gender}'S ${wc}`;
+  // Filter out athletes who have not taken a completed attempt yet
+  const activeLifters = standings.filter(l => {
+    const hasS = Array.isArray(l.squatAtts) && l.squatAtts.some(a => a && (a.status === 'good' || a.status === 'no-lift'));
+    const hasB = Array.isArray(l.benchAtts) && l.benchAtts.some(a => a && (a.status === 'good' || a.status === 'no-lift'));
+    const hasD = Array.isArray(l.deadAtts) && l.deadAtts.some(a => a && (a.status === 'good' || a.status === 'no-lift'));
+    const hasVal = (l.total && l.total !== '-') || (l.bestSquat && l.bestSquat !== '-') || (l.bestBench && l.bestBench !== '-') || (l.bestDead && l.bestDead !== '-');
+    return hasS || hasB || hasD || hasVal;
+  });
 
-        if (!grouped[groupKey]) grouped[groupKey] = [];
-        grouped[groupKey].push(l);
+  activeLifters.forEach(l => {
+    const gender = l.gender || 'MEN';
+    const wc = l.weightClass && l.weightClass !== '-' ? l.weightClass : 'OPEN CATEGORY';
+    const groupKey = `${gender}'S ${wc}`;
+
+    if (!grouped[groupKey]) grouped[groupKey] = [];
+    grouped[groupKey].push(l);
+  });
+
+  const blocks = [];
+
+  Object.keys(grouped).forEach(groupKey => {
+    const categoryLifters = grouped[groupKey];
+    categoryLifters.sort((a, b) => {
+      const totA = parseFloat(a.total) || 0;
+      const totB = parseFloat(b.total) || 0;
+      if (totB !== totA) return totB - totA;
+      return (parseFloat(b.points) || 0) - (parseFloat(a.points) || 0);
+    });
+
+    categoryLifters.forEach((l, idx) => {
+      blocks.push({
+        type: 'row',
+        data: l,
+        rank: idx + 1,
+        category: groupKey
       });
+    });
+  });
+
+  return blocks;
+}
 
       const blocks = [];
 
